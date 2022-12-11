@@ -22,6 +22,13 @@ public class CustomTest {
         System.out.println("Test 1 done");
     }
 
+
+
+    @Test(id = 3)
+    public static void test4(){
+        System.out.println("Test 4 done");
+    }
+
     @Test(id = 2)
     public static void test2(){
         System.out.println("Test 2 done");
@@ -32,10 +39,7 @@ public class CustomTest {
         System.out.println("Test 3 done");
     }
 
-    @Test(id = 4)
-    public static void test4(){
-        System.out.println("Test 4 done");
-    }
+
 
     @AfterSuite
     public static void afterSuite(){

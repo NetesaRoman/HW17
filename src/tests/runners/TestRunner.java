@@ -1,4 +1,4 @@
-package view;
+package tests.runners;
 /*
  *
  * @author Roman Netesa
@@ -15,7 +15,6 @@ import tests.api.ToMuchAnnotationException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 
 
 public class TestRunner {
@@ -37,7 +36,7 @@ public class TestRunner {
         //BeforeSuiteCall
         invokeByAnnotation(cl, ct, BeforeSuite.class);
         //Tests
-        invokeTests(cl, ct);
+        invokeTests(cl, ct, 1, 10);
         //AfterSuiteCall
         invokeByAnnotation(cl, ct, AfterSuite.class);
     }
@@ -61,9 +60,7 @@ public class TestRunner {
             }
         }
 
-        if (before >= 2 || after >= 2) {
-            throw new ToMuchAnnotationException();
-        }
+        handleAnnotations(before, after);
     }
 
     private static void invokeByAnnotation(Class<? extends CustomTest> cl,
@@ -81,20 +78,32 @@ public class TestRunner {
         }
     }
 
-    private static void invokeTests(Class<? extends CustomTest> cl, CustomTest ct) {
+    private static void invokeTests(Class<? extends CustomTest> cl, CustomTest ct, int from, int to) {
+        if(from > to){
+            System.out.println("error!");
+            return;
+        }
 
-        for (int i = 1; i <= 10; i++) {
+        for (int i = from; i <= to; i++) {
             for (Method method : cl.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Test.class)) {
-                    if (method.getAnnotation(Test.class).id() == i) {
-                        try {
-                            method.invoke(ct);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        }
+                if (method.isAnnotationPresent(Test.class) && method.getAnnotation(Test.class).id() == i) {
+                    try {
+                        method.invoke(ct);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
+        }
+    }
+
+
+
+    private static void handleAnnotations(int before, int after) throws ToMuchAnnotationException {
+        if (before >= 2) {
+            throw new ToMuchAnnotationException("BeforeSuite");
+        } else if (after >= 2) {
+            throw new ToMuchAnnotationException("AfterSuite");
         }
     }
 }
